@@ -385,7 +385,7 @@ function buildMarkets(){
 let state = {
   view:'auth', authMode:'login', authError:'', authLoading:false,
   currentUser:null,
-  match:{adversario:'Japão', fase:'Oitavas de final', data:'Seg. 29/06', hora:'14h00 (Brasília)', local:'NRG Stadium, Houston', kickoffAt:'2026-06-29T14:00'},
+  match:{adversario:'Japão', fase:'Dezesseis avos de final', data:'Seg. 29/06', hora:'14h00 (Brasília)', local:'NRG Stadium, Houston', kickoffAt:'2026-06-29T14:00'},
   premioMaximo: 10000,
   markets: buildMarkets(),
   settled:{},
@@ -399,6 +399,7 @@ let state = {
 /* ============== HELPERS ============== */
 const $ = sel => document.querySelector(sel);
 function fmtCPF(c){ c=(c||'').replace(/\D/g,''); return c.length===11 ? c.slice(0,3)+'.'+c.slice(3,6)+'.'+c.slice(6,9)+'-'+c.slice(9): c; }
+function fmtDateTime(iso){ if(!iso) return ''; const d=new Date(iso); const pad=n=>String(n).padStart(2,'0'); return pad(d.getDate())+'/'+pad(d.getMonth()+1)+' '+pad(d.getHours())+':'+pad(d.getMinutes()); }
 function combinedOdds(){ return state.slip.reduce((a,s)=>a*s.odds,1); }
 function showToast(msg){ state.toast=msg; render(); setTimeout(()=>{state.toast=null; render();},2200); }
 
@@ -853,6 +854,7 @@ function viewMyBets(){
     return `
     <div class="card ticket">
       <div class="card-title">🎫 Bilhete<span class="status-tag status-${b.status}">${b.status.toUpperCase()}</span></div>
+      <div class="muted small" style="margin-bottom:8px;">Apostado em ${fmtDateTime(b.created_at)}</div>
       ${b.selections.map(s=>`<div class="list-row"><span class="small muted">${s.marketLabel}: ${s.label}</span><span class="mono small">${Number(s.odds).toFixed(2)}x</span></div>`).join('')}
       <div class="totals-row"><span class="k">Aposta / Odds / Retorno</span><span class="v mono">${Number(b.stake)} · ${Number(b.odds).toFixed(2)}x · ${payout.toFixed(0)}</span></div>
       ${poolInfo}
@@ -995,7 +997,7 @@ function viewAdmin(){
       ${(state.adminApostas||[]).length ? (state.adminApostas||[]).map(a=>`
         <div style="padding:10px 0;border-bottom:1px solid var(--line);">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-            <div><strong>${a.participante_nome}</strong> <span class="muted small">${fmtCPF(a.participante_cpf)} · ${a.equipe}/${a.filial}</span></div>
+            <div><strong>${a.participante_nome}</strong> <span class="muted small">${fmtCPF(a.participante_cpf)} · ${a.equipe}/${a.filial} · ${fmtDateTime(a.created_at)}</span></div>
             <span class="status-tag status-${a.status}">${a.status.toUpperCase()}</span>
           </div>
           ${a.selections.map(s=>`<div class="small muted">• ${s.marketLabel}: ${s.label} (${Number(s.odds).toFixed(2)}x)</div>`).join('')}
